@@ -2,7 +2,7 @@
 
 Easily build composable queries for Ecto.
 
-[![Build Status](https://secure.travis-ci.org/dockyard/json_api_assert.svg?branch=master)](http://travis-ci.org/dockyard/json_api_assert)
+[![Build Status](https://secure.travis-ci.org/DockYard/json_api_assert.svg?branch=master)](http://travis-ci.org/DockYard/json_api_assert)
 
 ## Usage
 
