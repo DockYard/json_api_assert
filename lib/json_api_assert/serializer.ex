@@ -61,11 +61,13 @@ defmodule JsonApiAssert.Serializer do
 
     Map.put(map, "type", type)
   end
+  defp put_type(_map, _record, nil),
+    do: raise ArgumentError, "No type can be derived from record. Please pass a type to `serialize`."
+  defp put_type(map, _record, type),
+    do: Map.put(map, "type", type)
 
-  defp put_type(map, _record, type) do
-    Map.put(map, "type", type)
-  end
-
+  defp put_attributes(map, %{__struct__: _struct} = record, opts),
+    do: put_attributes(map, Map.from_struct(record), opts)
   defp put_attributes(map, record, opts) do
     primary_key = get_primary_key(record, opts[:primary_key])
 
@@ -79,8 +81,7 @@ defmodule JsonApiAssert.Serializer do
       |> Enum.into(%{}, fn(key) -> {key, true} end)
 
     attributes =
-      Map.from_struct(record)
-      |> Enum.reduce(%{}, fn({key, value}, attributes) ->
+      Enum.reduce(record, %{}, fn({key, value}, attributes) ->
         cond do
           Map.has_key?(except, key) and Map.has_key?(only, key) ->
             attributes
