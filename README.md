@@ -13,6 +13,8 @@ You can use the functions individually but they are optimally used in a composab
 fashion with the pipe operator:
 
 ```elixir
+import JsonApiAssert
+
 payload
 |> assert_data(user1)
 |> assert_data(user2)
