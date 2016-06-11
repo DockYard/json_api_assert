@@ -106,11 +106,16 @@ defmodule JsonApiAssert.Serializer do
     do: key
         |> Atom.to_string()
         |> serialize_key()
-
   defp serialize_key(key) when is_binary(key),
     do: key
         |> String.downcase()
         |> String.replace("_", "-")
 
+  defp serialize_value(%{__struct__: Ecto.DateTime} = value),
+    do: apply(Ecto.DateTime, :to_iso8601, [value])
+  defp serialize_value(%{__struct__: Ecto.Time} = value),
+    do: apply(Ecto.Time, :to_iso8601, [value])
+  defp serialize_value(%{__struct__: Ecto.Date} = value),
+    do: apply(Ecto.Date, :to_iso8601, [value])
   defp serialize_value(value), do: value
 end

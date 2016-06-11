@@ -14,6 +14,11 @@ defmodule JsonApiAssert.SerializerTest do
               last_name: nil
   end
 
+  defmodule Post do
+    defstruct id: nil,
+              created_at: nil
+  end
+
   test "serializes data from a record" do
     actual =
       %Author{id: 1, first_name: "Douglas", last_name: "Engelbart"}
@@ -159,6 +164,54 @@ defmodule JsonApiAssert.SerializerTest do
       "attributes" => %{
         "first-name" => "Douglas",
         "last-name" => "Engelbart"
+      }
+    }
+
+    assert actual == expected
+  end
+
+  test "serializaing Ecto.DateTime values" do
+    actual =
+      %Post{id: 1, created_at: Ecto.DateTime.from_erl({{2016,1,1},{0,0,0}})}
+      |> serialize()
+
+    expected = %{
+      "id" => 1,
+      "type" => "post",
+      "attributes" => %{
+        "created-at" => "2016-01-01T00:00:00Z"
+      }
+    }
+
+    assert actual == expected
+  end
+
+  test "serializaing Ecto.Time values" do
+    actual =
+      %Post{id: 1, created_at: Ecto.Time.from_erl({0,0,0})}
+      |> serialize()
+
+    expected = %{
+      "id" => 1,
+      "type" => "post",
+      "attributes" => %{
+        "created-at" => "00:00:00"
+      }
+    }
+
+    assert actual == expected
+  end
+
+  test "serializaing Ecto.Date values" do
+    actual =
+      %Post{id: 1, created_at: Ecto.Date.from_erl({2016,1,1})}
+      |> serialize()
+
+    expected = %{
+      "id" => 1,
+      "type" => "post",
+      "attributes" => %{
+        "created-at" => "2016-01-01"
       }
     }
 
