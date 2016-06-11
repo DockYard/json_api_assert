@@ -8,6 +8,8 @@ defmodule JsonApiAssert.Mixfile do
      elixirc_paths: elixirc_paths(Mix.env),
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
+     package: package(),
+     description: "assertions for JSON API payload",
      deps: deps,
      docs: [
       main: "JsonApiAssert",
@@ -24,6 +26,12 @@ defmodule JsonApiAssert.Mixfile do
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_env), do: ["lib"]
+
+  def package do
+    [maintainers: ["Brian Cardarella"],
+     licenses: ["MIT"],
+     links: %{"GitHub" => "https://github.com/DockYard/json_api_assert"}]
+  end
 
   # Dependencies can be Hex packages:
   #
