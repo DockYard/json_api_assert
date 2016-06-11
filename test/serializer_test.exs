@@ -36,6 +36,38 @@ defmodule JsonApiAssert.SerializerTest do
     assert actual == expected
   end
 
+  test "serializes data from a map" do
+    actual = %{
+      id: 1,
+      first_name: "Douglas",
+      last_name: "Engelbart"
+    }
+
+    actual = serialize(actual, type: "author")
+
+    expected = %{
+      "id" => 1,
+      "type" => "author",
+      "attributes" => %{
+        "first-name" => "Douglas",
+        "last-name" => "Engelbart"
+      }
+    }
+
+    assert actual == expected
+  end
+
+  test "raises when serialize can not determine type" do
+    assert_raise ArgumentError, "No type can be derived from record. Please pass a type to `serialize`.", fn ->
+      %{
+        id: 1,
+        first_name: "Douglas",
+        last_name: "Engelbart"
+      }
+      |> serialize()
+    end
+  end
+
   test "serializer can override type" do
     actual =
       %Author{id: 1, first_name: "Douglas", last_name: "Engelbart"}
