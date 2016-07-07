@@ -12,7 +12,7 @@ defmodule JsonApiAssert.Serializer do
       # Result:
 
       %{
-        "id" => 1,
+        "id" => "1",
         "type" => "users",
         "attributes" => %{
           "first-name" => "Brian",
@@ -43,6 +43,7 @@ defmodule JsonApiAssert.Serializer do
 
   defp put_id(serialized_record, record, primary_key) do
     id = Map.get(record, get_primary_key(record, primary_key))
+         |> to_string
 
     Map.put(serialized_record, "id", id)
   end

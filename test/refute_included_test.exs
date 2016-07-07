@@ -14,7 +14,7 @@ defmodule RefuteIncludedTest do
 
   test "will raise when record is found" do
     record = %{
-      "id" => 1,
+      "id" => "1",
       "type" => "author"
     }
 
@@ -39,7 +39,7 @@ defmodule RefuteIncludedTest do
   test "will not raise if we force an value mis-match and everything else matches" do
     author =
       data(:author)
-      |> put_in(["id"], 2)
+      |> put_in(["id"], "2")
 
     refute_included(data(:payload), author)
   end

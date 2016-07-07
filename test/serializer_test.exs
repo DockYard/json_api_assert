@@ -25,7 +25,7 @@ defmodule JsonApiAssert.SerializerTest do
       |> serialize()
 
     expected = %{
-      "id" => 1,
+      "id" => "1",
       "type" => "author",
       "attributes" => %{
         "first-name" => "Douglas",
@@ -46,7 +46,7 @@ defmodule JsonApiAssert.SerializerTest do
     actual = serialize(actual, type: "author")
 
     expected = %{
-      "id" => 1,
+      "id" => "1",
       "type" => "author",
       "attributes" => %{
         "first-name" => "Douglas",
@@ -74,7 +74,7 @@ defmodule JsonApiAssert.SerializerTest do
       |> serialize(type: "writers")
 
     expected = %{
-      "id" => 1,
+      "id" => "1",
       "type" => "writers",
       "attributes" => %{
         "first-name" => "Douglas",
@@ -92,7 +92,7 @@ defmodule JsonApiAssert.SerializerTest do
       |> serialize(primary_key: :other_id)
 
     expected = %{
-      "id" => 1,
+      "id" => "1",
       "type" => "writer",
       "attributes" => %{
         "first-name" => "Douglas",
@@ -109,7 +109,7 @@ defmodule JsonApiAssert.SerializerTest do
       |> serialize(primary_key: "other_id")
 
     expected = %{
-      "id" => 1,
+      "id" => "1",
       "type" => "writer",
       "attributes" => %{
         "first-name" => "Douglas",
@@ -126,7 +126,7 @@ defmodule JsonApiAssert.SerializerTest do
       |> serialize(except: [:first_name])
 
     expected = %{
-      "id" => 1,
+      "id" => "1",
       "type" => "author",
       "attributes" => %{
         "last-name" => "Engelbart"
@@ -142,7 +142,7 @@ defmodule JsonApiAssert.SerializerTest do
       |> serialize(only: [:first_name])
 
     expected = %{
-      "id" => 1,
+      "id" => "1",
       "type" => "author",
       "attributes" => %{
         "first-name" => "Douglas"
@@ -158,7 +158,7 @@ defmodule JsonApiAssert.SerializerTest do
       |> serialize(except: [:first_name], only: [:first_name])
 
     expected = %{
-      "id" => 1,
+      "id" => "1",
       "type" => "author",
       "attributes" => %{
         "last-name" => "Engelbart"
@@ -174,7 +174,7 @@ defmodule JsonApiAssert.SerializerTest do
       |> s()
 
     expected = %{
-      "id" => 1,
+      "id" => "1",
       "type" => "author",
       "attributes" => %{
         "first-name" => "Douglas",
@@ -191,7 +191,7 @@ defmodule JsonApiAssert.SerializerTest do
       |> s(type: "writers")
 
     expected = %{
-      "id" => 1,
+      "id" => "1",
       "type" => "writers",
       "attributes" => %{
         "first-name" => "Douglas",
@@ -208,7 +208,7 @@ defmodule JsonApiAssert.SerializerTest do
       |> serialize()
 
     expected = %{
-      "id" => 1,
+      "id" => "1",
       "type" => "post",
       "attributes" => %{
         "created-at" => "2016-01-01T00:00:00Z"
@@ -224,7 +224,7 @@ defmodule JsonApiAssert.SerializerTest do
       |> serialize()
 
     expected = %{
-      "id" => 1,
+      "id" => "1",
       "type" => "post",
       "attributes" => %{
         "created-at" => "00:00:00"
@@ -240,7 +240,7 @@ defmodule JsonApiAssert.SerializerTest do
       |> serialize()
 
     expected = %{
-      "id" => 1,
+      "id" => "1",
       "type" => "post",
       "attributes" => %{
         "created-at" => "2016-01-01"

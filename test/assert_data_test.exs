@@ -4,7 +4,7 @@ defmodule AssertDataTest do
   import JsonApiAssert.TestData, only: [data: 1]
 
   @article %{
-    "id" => 1,
+    "id" => "1",
     "type" => "article",
     "attributes" => %{
       "title" => "Mother of all demos"
@@ -35,7 +35,7 @@ defmodule AssertDataTest do
 
     post =
       data(:post)
-      |> put_in(["id"], 2)
+      |> put_in(["id"], "2")
 
     assert_raise ExUnit.AssertionError, msg, fn ->
       assert_data(data(:payload), post)

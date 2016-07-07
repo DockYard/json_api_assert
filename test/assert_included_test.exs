@@ -4,7 +4,7 @@ defmodule AssertIncludedTest do
   import JsonApiAssert.TestData, only: [data: 1]
 
   @writer %{
-    "id" => 1,
+    "id" => "1",
     "type" => "writer",
     "attributes" => %{
       "first-name" => "Douglas",
@@ -36,7 +36,7 @@ defmodule AssertIncludedTest do
     msg = "could not find a record with matching `id` 2 and `type` \"author\""
     author =
       data(:author)
-      |> put_in(["id"], 2)
+      |> put_in(["id"], "2")
 
     assert_raise ExUnit.AssertionError, msg, fn ->
       assert_included(data(:payload), author)
