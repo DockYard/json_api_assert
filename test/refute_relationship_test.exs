@@ -25,7 +25,7 @@ defmodule RefuteRelationshipTest do
   test "will not raise when child record's id not found as a relationship for parent" do
     author =
       data(:author)
-      |> put_in(["id"], 2)
+      |> put_in(["id"], "2")
 
     refute_relationship(data(:payload), author, as: "author", for: data(:post))
   end
@@ -46,7 +46,7 @@ defmodule RefuteRelationshipTest do
     payload = %{
       "jsonapi" => %{ "version" => "1.0" },
       "data" => %{
-        "id" => 1,
+        "id" => "1",
         "type" => "post",
         "attributes" => %{
           "title" => "Mother of all demos"

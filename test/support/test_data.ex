@@ -5,7 +5,7 @@ defmodule JsonApiAssert.TestData do
 
   def post do
     %{
-      "id" => 1,
+      "id" => "1",
       "type" => "post",
       "attributes" => %{
         "title" => "Mother of all demos"
@@ -15,7 +15,7 @@ defmodule JsonApiAssert.TestData do
 
   def author do
     %{
-      "id" => 1,
+      "id" => "1",
       "type" => "author",
       "attributes" => %{
         "first-name" => "Douglas",
@@ -30,26 +30,26 @@ defmodule JsonApiAssert.TestData do
         "version" => "1.0"
       },
       "data" => %{
-        "id" => 1,
+        "id" => "1",
         "type" => "post",
         "attributes" => %{
           "title" => "Mother of all demos"
         },
         "relationships" => %{
           "author" => %{
-            "data" => %{ "type" => "author", "id" => 1 }
+            "data" => %{ "type" => "author", "id" => "1" }
           },
           "comments" => %{
             "data" => [
-              %{ "type" => "comment", "id" => 1 },
-              %{ "type" => "comment", "id" => 2 }
+              %{ "type" => "comment", "id" => "1" },
+              %{ "type" => "comment", "id" => "2" }
             ]
           }
         }
       },
       "included" => [
         %{
-          "id" => 1,
+          "id" => "1",
           "type" => "author",
           "attributes" => %{
             "first-name" => "Douglas",
@@ -58,30 +58,30 @@ defmodule JsonApiAssert.TestData do
           "relationships" => %{
             "posts" => %{
               "data" => [
-                %{ "type" => "post", "id" => 1 }
+                %{ "type" => "post", "id" => "1" }
               ]
             }
           }
         }, %{
-          "id" => 1,
+          "id" => "1",
           "type" => "comment",
           "attributes" => %{
             "body" => "This is great!"
           },
           "relationships" => %{
             "post" => %{
-              "data" => %{ "type" => "post", "id" => 1 }
+              "data" => %{ "type" => "post", "id" => "1" }
             }
           }
         }, %{
-          "id" => 2,
+          "id" => "2",
           "type" => "comment",
           "attributes" => %{
             "body" => "This is horrible!"
           },
           "relationships" => %{
             "post" => %{
-              "data" => %{ "type" => "post", "id" => 1 }
+              "data" => %{ "type" => "post", "id" => "1" }
             }
           }
         }

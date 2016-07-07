@@ -23,7 +23,7 @@ defmodule AssertRelationshipTest do
     msg = "could not find relationship `author` with `id` 2 and `type` \"author\" for record matching `id` 1 and `type` \"post\""
     author =
       data(:author)
-      |> put_in(["id"], 2)
+      |> put_in(["id"], "2")
 
     assert_raise ExUnit.AssertionError, msg, fn ->
       assert_relationship(data(:payload), author, as: "author", for: data(:post))
@@ -54,7 +54,7 @@ defmodule AssertRelationshipTest do
     payload = %{
       "jsonapi" => %{ "version" => "1.0" },
       "data" => %{
-        "id" => 1,
+        "id" => "1",
         "type" => "post",
         "attributes" => %{
           "title" => "Mother of all demos"

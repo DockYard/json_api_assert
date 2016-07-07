@@ -13,7 +13,7 @@ defmodule RefuteDataTest do
 
   test "will raise when record is found" do
     record = %{
-      "id" => 1,
+      "id" => "1",
       "type" => "post"
     }
 
@@ -37,7 +37,7 @@ defmodule RefuteDataTest do
   test "will not raise if we force an id value mis-match and everything else matches" do
     post =
       data(:post)
-      |> put_in(["id"], 2)
+      |> put_in(["id"], "2")
 
     refute_data(data(:payload), post)
   end
