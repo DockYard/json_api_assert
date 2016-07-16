@@ -13,8 +13,11 @@ defmodule AssertJsonApiTest do
   end
 
   test "assert - will raise if no jsonapi object exists" do
-    assert_raise ExUnit.AssertionError, "jsonapi object not found", fn ->
+    try do
       assert_jsonapi(%{}, version: "1.1")
+    rescue
+      error in [ExUnit.AssertionError] ->
+        assert "jsonapi object not found" == error.message
     end
   end
 
@@ -25,8 +28,11 @@ defmodule AssertJsonApiTest do
       }
     }
 
-    assert_raise ExUnit.AssertionError, "jsonapi object mismatch\nExpected:\n  `version` \"1.1\"\nGot:\n  `version` \"1.0\"", fn ->
+    try do
       assert_jsonapi(payload, version: "1.1")
+    rescue
+      error in [ExUnit.AssertionError] ->
+        assert "jsonapi object mismatch\nExpected:\n  `version` \"1.1\"\nGot:\n  `version` \"1.0\"" == error.message
     end
   end
 
