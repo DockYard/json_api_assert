@@ -5,20 +5,30 @@ defmodule RefuteRelationshipTest do
 
   test "will raise when relationship is found in a data record" do
     msg = "was not expecting to find the relationship `author` with `id` 1 and `type` \"author\" for record matching `id` 1 and `type` \"post\""
-    assert_raise ExUnit.AssertionError, msg, fn ->
+
+    try do
       refute_relationship(data(:payload), data(:author), as: "author", for: data(:post))
+    rescue
+      error in [ExUnit.AssertionError] ->
+        assert msg == error.message
     end
   end
 
   test "will raise if `as:` is not passed" do
-    assert_raise ExUnit.AssertionError, "you must pass `as:` with the name of the relationship", fn ->
+    try do
       refute_relationship(data(:payload), data(:author), for: data(:post))
+    rescue
+      error in [ExUnit.AssertionError] ->
+        assert "you must pass `as:` with the name of the relationship" == error.message
     end
   end
 
   test "will raise if `for:` is not passed" do
-    assert_raise ExUnit.AssertionError, "you must pass `for:` with the parent record", fn ->
+    try do
       refute_relationship(data(:payload), data(:author), as: "author")
+    rescue
+      error in [ExUnit.AssertionError] ->
+        assert "you must pass `for:` with the parent record" == error.message
     end
   end
 

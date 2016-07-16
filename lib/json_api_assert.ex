@@ -37,11 +37,12 @@ defmodule JsonApiAssert do
   def assert_jsonapi(%{"jsonapi" => jsonapi} = payload, members) do
     Enum.reduce(members, [], fn({key, value}, unmatched) ->
       actual_value = jsonapi[Atom.to_string(key)]
-      if actual_value != value do
-        unmatched = unmatched ++ ["Expected:\n  `#{key}` \"#{value}\"\nGot:\n  `#{key}` \"#{actual_value}\""]
-      end
 
-      unmatched
+      if actual_value != value do
+        unmatched ++ ["Expected:\n  `#{key}` \"#{value}\"\nGot:\n  `#{key}` \"#{actual_value}\""]
+      else
+        unmatched
+      end
     end)
     |> case do
       [] -> payload

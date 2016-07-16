@@ -37,16 +37,22 @@ defmodule AssertDataTest do
       data(:post)
       |> put_in(["id"], "2")
 
-    assert_raise ExUnit.AssertionError, msg, fn ->
+    try do
       assert_data(data(:payload), post)
+    rescue
+      error in [ExUnit.AssertionError] ->
+        assert msg == error.message
     end
   end
 
   test "will raise when there is a type mismatch" do
     msg = "could not find a record with matching `id` 1 and `type` \"article\""
 
-    assert_raise ExUnit.AssertionError, msg, fn ->
+    try do
       assert_data(data(:payload), @article)
+    rescue
+      error in [ExUnit.AssertionError] ->
+        assert msg == error.message
     end
   end
 

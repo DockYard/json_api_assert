@@ -19,8 +19,11 @@ defmodule RefuteDataTest do
 
     msg = "did not expect #{inspect record} to be found."
 
-    assert_raise ExUnit.AssertionError, msg, fn ->
+    try do
       refute_data(data(:payload), data(:post))
+    rescue
+      error in [ExUnit.AssertionError] ->
+        assert msg == error.message
     end
   end
 

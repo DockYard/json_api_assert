@@ -20,8 +20,11 @@ defmodule RefuteIncludedTest do
 
     msg = "did not expect #{inspect record} to be found."
 
-    assert_raise ExUnit.AssertionError, msg, fn ->
+    try do
       refute_included(data(:payload), data(:author))
+    rescue
+      error in [ExUnit.AssertionError] ->
+        assert msg == error.message
     end
   end
 

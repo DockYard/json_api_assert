@@ -38,16 +38,22 @@ defmodule AssertIncludedTest do
       data(:author)
       |> put_in(["id"], "2")
 
-    assert_raise ExUnit.AssertionError, msg, fn ->
+    try do
       assert_included(data(:payload), author)
+    rescue
+      error in [ExUnit.AssertionError] ->
+        assert msg == error.message
     end
   end
 
   test "will raise when there is a type mismatch" do
     msg = "could not find a record with matching `id` 1 and `type` \"writer\""
 
-    assert_raise ExUnit.AssertionError, msg, fn ->
+    try do
       assert_included(data(:payload), @writer)
+    rescue
+      error in [ExUnit.AssertionError] ->
+        assert msg == error.message
     end
   end
 

@@ -8,14 +8,20 @@ defmodule AssertRelationshipTest do
   end
 
   test "will raise if `as:` is not passed" do
-    assert_raise ExUnit.AssertionError, "you must pass `as:` with the name of the relationship", fn ->
+    try do
       assert_relationship(data(:payload), data(:author), for: data(:post))
+    rescue
+      error in [ExUnit.AssertionError] ->
+      assert "you must pass `as:` with the name of the relationship" == error.message
     end
   end
 
   test "will raise if `for:` is not passed" do
-    assert_raise ExUnit.AssertionError, "you must pass `for:` with the parent record", fn ->
+    try do
       assert_relationship(data(:payload), data(:author), as: "author")
+    rescue
+      error in [ExUnit.AssertionError] ->
+        assert "you must pass `for:` with the parent record" == error.message
     end
   end
 
@@ -25,8 +31,11 @@ defmodule AssertRelationshipTest do
       data(:author)
       |> put_in(["id"], "2")
 
-    assert_raise ExUnit.AssertionError, msg, fn ->
+    try do
       assert_relationship(data(:payload), author, as: "author", for: data(:post))
+    rescue
+      error in [ExUnit.AssertionError] ->
+        assert msg == error.message
     end
   end
 
@@ -36,16 +45,22 @@ defmodule AssertRelationshipTest do
       data(:author)
       |> put_in(["type"], "writer")
 
-    assert_raise ExUnit.AssertionError, msg, fn ->
+    try do
       assert_relationship(data(:payload), author, as: "author", for: data(:post))
+    rescue
+      error in [ExUnit.AssertionError] ->
+        assert msg == error.message
     end
   end
 
   test "will raise when relationship name not found" do
     msg = "could not find the relationship `writer` for record matching `id` 1 and `type` \"post\""
 
-    assert_raise ExUnit.AssertionError, msg, fn ->
+    try do
       assert_relationship(data(:payload), data(:author), as: "writer", for: data(:post))
+    rescue
+      error in [ExUnit.AssertionError] ->
+        assert msg == error.message
     end
   end
 
@@ -62,8 +77,11 @@ defmodule AssertRelationshipTest do
       }
     }
 
-    assert_raise ExUnit.AssertionError, msg, fn ->
+    try do
       assert_relationship(payload, data(:author), as: "writer", for: data(:post))
+    rescue
+      error in [ExUnit.AssertionError] ->
+        assert msg == error.message
     end
   end
 
