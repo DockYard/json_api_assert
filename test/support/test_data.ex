@@ -84,6 +84,17 @@ defmodule JsonApiAssert.TestData do
     }
   end
 
+  def meta do
+    %{
+      "meta" => %{
+        "license" => "The MIT License (MIT)",
+        "authors" => [
+          "Brian Cardarella"
+        ]
+      }
+    }
+  end
+
   def payload do
     %{
       "jsonapi" => %{
