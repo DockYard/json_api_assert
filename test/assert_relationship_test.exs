@@ -99,4 +99,9 @@ defmodule AssertRelationshipTest do
         assert "record with `id` 1 and `type` \"post\" was found but had mis-matching attributes" == error.message
     end
   end
+
+  test "will return the original payload" do
+    payload = assert_relationship(data(:payload), data(:author), as: "author", for: data(:post))
+    assert payload == data(:payload)
+  end
 end
