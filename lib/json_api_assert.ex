@@ -140,6 +140,8 @@ defmodule JsonApiAssert do
       |> Enum.find(&(meta_data_compare(&1, child_record)))
 
     assert relationship, "could not find relationship `#{as}` with `id` #{child_record["id"]} and `type` \"#{child_record["type"]}\" for record matching `id` #{parent_record["id"]} and `type` \"#{parent_record["type"]}\""
+
+    payload
   end
   def assert_relationship(_, _, [for: _]),
     do: raise ExUnit.AssertionError, "you must pass `as:` with the name of the relationship"
@@ -163,6 +165,8 @@ defmodule JsonApiAssert do
     |> List.wrap()
     |> Enum.find(&(meta_data_compare(&1, child_record)))
     |> refute("was not expecting to find the relationship `#{as}` with `id` #{child_record["id"]} and `type` \"#{child_record["type"]}\" for record matching `id` #{parent_record["id"]} and `type` \"#{parent_record["type"]}\"")
+
+    payload
   end
   def refute_relationship(_, _, [for: _]),
     do: raise ExUnit.AssertionError, "you must pass `as:` with the name of the relationship"
