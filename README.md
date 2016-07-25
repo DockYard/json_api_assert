@@ -25,29 +25,17 @@ payload
 |> assert_included(pet2)
 ```
 
-The records passed *must* be already be serialized. Read more about
+The records passed *must* already be serialized. Read more about
 [serializers](#record-serialization) below to see how to easily manage this with structs or Ecto
 models.
 
 If you've tested JSON API payloads before the benefits of this pattern should
 be obvious. Hundreds of lines of codes can be reduced to just a handful. Brittle tests are
 now flexible and don't care about inseration / render order.
-"""
-
-@doc """
-Asserts that the "jsonapi" object exists in the payload
-
-```elixir
-payload
-|> assert_jsonapi(version: "1.0")
-```
-
-The members argument should be a key/value pair of members you expect to be be in
-the "jsonapi" object of the payload.
 
 ## Record Serialization
 
-The assert/refute function expect json-api serialized maps. You can
+The assert/refute functions expect json-api serialized maps. You can
 write these yourself but that can be verbose. Instead it is easier to
 manage your data as structs or better from Ecto models. Just use our
 built-in serializers.
