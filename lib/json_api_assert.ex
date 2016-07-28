@@ -35,6 +35,8 @@ defmodule JsonApiAssert do
   def assert_jsonapi(payload, members \\ [])
 
   def assert_jsonapi(%{"jsonapi" => jsonapi} = payload, members) do
+    enforce_top_level_constraints(payload)
+
     Enum.reduce(members, [], fn({key, value}, unmatched) ->
       actual_value = jsonapi[Atom.to_string(key)]
 
@@ -235,4 +237,15 @@ defmodule JsonApiAssert do
     do: payload ++ data
   defp merge_data(payload, data) when is_map(data),
     do: merge_data(payload, [data])
+
+  defp enforce_top_level_constraints(payload) do
+    if Map.has_key?(payload, "data") && Map.has_key?(payload, "errors"),
+      do: raise ExUnit.AssertionError, "the members `data` and `errors` MUST NOT coexist in the same document"
+
+    if !Map.has_key?(payload, "data") && Map.has_key?(payload, "included"),
+      do: raise ExUnit.AssertionError, "If a document does not contain a top-level data key, the included member MUST NOT be present either."
+
+    unless Map.has_key?(payload, "data") || Map.has_key?(payload, "errors") || Map.has_key?(payload, "meta"),
+      do: raise ExUnit.AssertionError, "A document MUST contain at least one of the following top-level members: 'data', 'errors', 'meta'"
+  end
 end
