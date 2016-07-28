@@ -8,6 +8,8 @@ defmodule JsonApiAssert do
   You can use the functions individually but they are optimally used in a composable
   fashion with the pipe operator:
 
+  ## Examples
+
       payload
       |> assert_data(user1)
       |> assert_data(user2)
@@ -18,12 +20,14 @@ defmodule JsonApiAssert do
       |> assert_included(pet2)
 
   If you've tested JSON API payloads before the benefits of this pattern should
-  be obvious. Hundreds of lines of codes can be reduced to just a handful. Brittle tests are
-  now flexible and don't care about inseration / render order.
+  be obvious. Hundreds of lines of code can be reduced to just a handful. Brittle tests are
+  now flexible and don't care about insertion / render order.
   """
 
   @doc """
   Asserts that the "jsonapi" object exists in the payload
+
+  ## Examples
 
       payload
       |> assert_jsonapi(version: "1.0")
@@ -59,6 +63,8 @@ defmodule JsonApiAssert do
   @doc """
   Asserts that a given record is included in the `data` object of the payload.
 
+  ## Examples
+
       payload
       |> assert_data(user1)
   """
@@ -72,6 +78,8 @@ defmodule JsonApiAssert do
   @doc """
   Refutes that a given record is included in the `data` object of the payload.
 
+  ## Examples
+
       payload
       |> refute_data(user1)
   """
@@ -84,6 +92,8 @@ defmodule JsonApiAssert do
 
   @doc """
   Asserts that a given record is included in the `included` object of the payload.
+
+  ## Examples
 
       payload
       |> assert_included(pet1)
@@ -99,6 +109,8 @@ defmodule JsonApiAssert do
   @doc """
   Refutes that a given record is included in the `included` object of the payload.
 
+  ## Examples
+
       payload
       |> refute_included(pet1)
   """
@@ -111,6 +123,8 @@ defmodule JsonApiAssert do
 
   @doc """
   Asserts that the proper relationship meta data exists between a parent and child record
+
+  ## Examples
 
       payload
       |> assert_relationship(pet1, as: "pets", for: owner1)
@@ -152,6 +166,8 @@ defmodule JsonApiAssert do
 
   @doc """
   Refutes a relationship between two records
+
+  ## Examples
 
       payload
       |> refute_relationship(pet1, as: "pets", for: owner1)
