@@ -62,4 +62,21 @@ defmodule AssertIncludedTest do
 
     assert payload == data(:payload)
   end
+
+  test "can assert many records at once" do
+    payload = assert_included(data(:payload_2), [data(:comment_1), data(:comment_2)])
+
+    assert payload == data(:payload_2)
+  end
+
+  test "will fail if one of the records is not present" do
+    msg = "could not find a record with matching `id` 3 and `type` \"comment\""
+
+    try do
+      assert_included(data(:payload), [data(:comment_1), data(:comment_3)])
+    rescue
+      error in [ExUnit.AssertionError] ->
+        assert msg == error.message
+    end
+  end
 end

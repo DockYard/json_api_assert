@@ -46,4 +46,25 @@ defmodule RefuteIncludedTest do
 
     refute_included(data(:payload), author)
   end
+
+  test "can refute many records at once" do
+    payload = refute_included(data(:payload), [data(:comment_3), data(:comment_4)])
+
+    assert payload == data(:payload)
+  end
+
+  test "will fail if one of the records is present" do
+    record = %{
+      "id" => "1",
+      "type" => "comment"
+    }
+    msg = "did not expect #{inspect record} to be found."
+
+    try do
+      refute_included(data(:payload), [data(:comment_3), data(:comment_1)])
+    rescue
+      error in [ExUnit.AssertionError] ->
+        assert msg == error.message
+    end
+  end
 end

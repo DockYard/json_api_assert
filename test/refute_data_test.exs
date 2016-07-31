@@ -44,4 +44,29 @@ defmodule RefuteDataTest do
 
     refute_data(data(:payload), post)
   end
+
+  test "can refute many records at once" do
+    post =
+      data(:post)
+      |> put_in(["attributes", "title"], "Father of all demos")
+
+    payload = refute_data(data(:payload), [post, data(:post_2)])
+
+    assert payload == data(:payload)
+  end
+
+  test "will fail if one of the records is present" do
+    record = %{
+      "id" => "1",
+      "type" => "post"
+    }
+    msg = "did not expect #{inspect record} to be found."
+
+    try do
+      refute_data(data(:payload), [data(:post_2), data(:post)])
+    rescue
+      error in [ExUnit.AssertionError] ->
+        assert msg == error.message
+    end
+  end
 end
