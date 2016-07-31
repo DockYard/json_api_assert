@@ -12,7 +12,7 @@ defmodule AssertRelationshipTest do
       assert_relationship(data(:payload), data(:author), for: data(:post))
     rescue
       error in [ExUnit.AssertionError] ->
-      assert "you must pass `as:` with the name of the relationship" == error.message
+        assert "you must pass `as:` with the name of the relationship" == error.message
     end
   end
 
