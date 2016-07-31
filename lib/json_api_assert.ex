@@ -67,8 +67,15 @@ defmodule JsonApiAssert do
 
       payload
       |> assert_data(user1)
+
+  Can also take a list of records. The list will be iterated over asserting each record individually.
   """
-  @spec assert_data(map, map | struct) :: map
+  @spec assert_data(map, map | struct | list) :: map
+  def assert_data(payload, []), do: payload
+  def assert_data(payload, [record | records]) do
+    assert_data(payload, record)
+    |> assert_data(records)
+  end
   def assert_data(payload, record) do
     assert_record(payload["data"], record)
 
@@ -82,8 +89,15 @@ defmodule JsonApiAssert do
 
       payload
       |> refute_data(user1)
+
+  Can also take a list of records. The list will be iterated over refuting each record individually.
   """
-  @spec refute_data(map, map | struct) :: map
+  def refute_data(payload, []), do: payload
+  def refute_data(payload, [record | records]) do
+    refute_data(payload, record)
+    |> refute_data(records)
+  end
+  @spec refute_data(map, map | struct | list) :: map
   def refute_data(payload, record) do
     refute_record(payload["data"], record)
 
@@ -97,8 +111,15 @@ defmodule JsonApiAssert do
 
       payload
       |> assert_included(pet1)
+
+  Can also take a list of records. The list will be iterated over asserting each record individually.
   """
-  @spec assert_included(map, map | struct) :: map
+  @spec assert_included(map, map | struct | list) :: map
+  def assert_included(payload, []), do: payload
+  def assert_included(payload, [record | records]) do
+    assert_included(payload, record)
+    |> assert_included(records)
+  end
   def assert_included(payload, record) do
     assert_record(payload["included"], record)
 
@@ -113,8 +134,15 @@ defmodule JsonApiAssert do
 
       payload
       |> refute_included(pet1)
+
+  Can also take a list of records. The list will be iterated over refuting each record individually.
   """
-  @spec refute_included(map, map | struct) :: map
+  @spec refute_included(map, map | struct | list) :: map
+  def refute_included(payload, []), do: payload
+  def refute_included(payload, [record | records]) do
+    refute_included(payload, record)
+    |> refute_included(records)
+  end
   def refute_included(payload, record) do
     refute_record(payload["included"], record)
 

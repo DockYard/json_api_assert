@@ -61,4 +61,21 @@ defmodule AssertDataTest do
 
     assert payload == data(:payload)
   end
+
+  test "can assert many records at once" do
+    payload = assert_data(data(:payload_2), [data(:post), data(:post_2)])
+
+    assert payload == data(:payload_2)
+  end
+
+  test "will fail if one of the records is not present" do
+    msg = "could not find a record with matching `id` 2 and `type` \"post\""
+
+    try do
+      assert_data(data(:payload), [data(:post), data(:post_2)])
+    rescue
+      error in [ExUnit.AssertionError] ->
+        assert msg == error.message
+    end
+  end
 end
