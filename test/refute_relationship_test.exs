@@ -86,4 +86,21 @@ defmodule RefuteRelationshipTest do
     payload = refute_relationship(data(:payload), data(:author), as: "writer", for: data(:post))
     assert payload == data(:payload)
   end
+
+  test "can refute many records at once" do
+    payload = refute_relationship(data(:payload_2), [data(:comment_3), data(:comment_4)], as: "comments", for: data(:post))
+
+    assert payload == data(:payload_2)
+  end
+
+  test "will fail if one of the records is present" do
+    msg = "was not expecting to find the relationship `comments` with `id` 1 and `type` \"comment\" for record matching `id` 1 and `type` \"post\""
+
+    try do
+      refute_relationship(data(:payload_2), [data(:comment_3), data(:comment_1)], as: "comments", for: data(:post))
+    rescue
+      error in [ExUnit.AssertionError] ->
+        assert msg == error.message
+    end
+  end
 end

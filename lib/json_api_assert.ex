@@ -158,9 +158,32 @@ defmodule JsonApiAssert do
       |> assert_relationship(pet1, as: "pets", for: owner1)
 
   The `as:` atom must be passed the name of the relationship. It will not be derived from the child.
+
+  An optional `included` boolean can be passed if you'd like to assert if the record is in the `included` section of
+  the payload:
+
+      payload
+      |> assert_relationship(pet1, as: "pets", for: owner1, included: true)
+
+  This is functionally equivalent to:
+
+      payload
+      |> assert_relationship(pet1, as: "pets", for: owner1)
+      |> assert_included(pet1)
+
+  If you pass `false` instead `refute_included/3` is used.
+
+  This function can also take a list of child records. The list will be iterated over asserting each record individually.
   """
-  @spec assert_relationship(map, map, [as: binary, for: binary]) :: map
-  def assert_relationship(payload, child_record, [as: as, for: parent_record]) do
+  @spec assert_relationship(map, map | list, [as: binary, for: binary, included: boolean]) :: map
+  def assert_relationship(payload, [], _opts), do: payload
+  def assert_relationship(payload, [child_record | child_records], opts) do
+    assert_relationship(payload, child_record, opts)
+    |> assert_relationship(child_records, opts)
+  end
+  def assert_relationship(payload, child_record, [as: as, for: parent_record]),
+    do: assert_relationship(payload, child_record, as: as, for: parent_record, included: nil)
+  def assert_relationship(payload, child_record, [as: as, for: parent_record, included: included?]) do
     parent_record =
       merge_data([], payload["data"])
       |> merge_data(payload["included"])
@@ -185,7 +208,11 @@ defmodule JsonApiAssert do
 
     assert relationship, "could not find relationship `#{as}` with `id` #{child_record["id"]} and `type` \"#{child_record["type"]}\" for record matching `id` #{parent_record["id"]} and `type` \"#{parent_record["type"]}\""
 
-    payload
+    case included? do
+      nil -> payload
+      true -> assert_included(payload, child_record)
+      false -> refute_included(payload, child_record)
+    end
   end
   def assert_relationship(_, _, [for: _]),
     do: raise ExUnit.AssertionError, "you must pass `as:` with the name of the relationship"
@@ -201,8 +228,15 @@ defmodule JsonApiAssert do
       |> refute_relationship(pet1, as: "pets", for: owner1)
 
   The `as:` atom must be passed the name of the relationship. It will not be derived from the child.
+
+  This function can also take a list of child records. The list will be iterated over refuting each record individually.
   """
-  @spec refute_relationship(map, map, [as: binary, for: binary]) :: map
+  @spec refute_relationship(map, map | list, [as: binary, for: binary]) :: map
+  def refute_relationship(payload, [], _opts), do: payload
+  def refute_relationship(payload, [child_record | child_records], opts) do
+    refute_relationship(payload, child_record, opts)
+    |> refute_relationship(child_records, opts)
+  end
   def refute_relationship(payload, child_record, [as: as, for: parent_record]) do
     merge_data([], payload["data"])
     |> merge_data(payload["included"])
