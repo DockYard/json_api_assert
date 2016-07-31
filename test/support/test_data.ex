@@ -74,6 +74,16 @@ defmodule JsonApiAssert.TestData do
     }
   end
 
+  def comment_5 do
+    %{
+      "id" => "5",
+      "type" => "comment",
+      "attributes" => %{
+        "body" => "This is OK"
+      }
+    }
+  end
+
   def payload do
     %{
       "jsonapi" => %{
@@ -92,7 +102,8 @@ defmodule JsonApiAssert.TestData do
           "comments" => %{
             "data" => [
               %{ "type" => "comment", "id" => "1" },
-              %{ "type" => "comment", "id" => "2" }
+              %{ "type" => "comment", "id" => "2" },
+              %{ "type" => "comment", "id" => "5" }
             ]
           }
         }

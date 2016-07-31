@@ -104,4 +104,51 @@ defmodule AssertRelationshipTest do
     payload = assert_relationship(data(:payload), data(:author), as: "author", for: data(:post))
     assert payload == data(:payload)
   end
+
+  test "will assert the record is included when `included: true` is used" do
+    assert_relationship(data(:payload), data(:comment_1), as: "comments", for: data(:post), included: true)
+  end
+
+  test "will raise when  the record is not included and `included: true` is used" do
+    msg = "could not find a record with matching `id` 5 and `type` \"comment\""
+
+    try do
+      assert_relationship(data(:payload), data(:comment_5), as: "comments", for: data(:post), included: true)
+    rescue
+      error in [ExUnit.AssertionError] ->
+        assert msg == error.message
+    end
+  end
+
+  test "will raise when the record is included and `included: false` is used" do
+    record = %{
+      "id" => "1",
+      "type" => "comment"
+    }
+    msg = "did not expect #{inspect record} to be found."
+
+    try do
+      assert_relationship(data(:payload), data(:comment_1), as: "comments", for: data(:post), included: false)
+    rescue
+      error in [ExUnit.AssertionError] ->
+        assert msg == error.message
+    end
+  end
+
+  test "can assert many records at once" do
+    payload = assert_relationship(data(:payload_2), [data(:comment_1), data(:comment_2)], as: "comments", for: data(:post))
+
+    assert payload == data(:payload_2)
+  end
+
+  test "will fail if one of the records is not present" do
+    msg = "could not find relationship `comments` with `id` 3 and `type` \"comment\" for record matching `id` 1 and `type` \"post\""
+
+    try do
+      assert_relationship(data(:payload_2), [data(:comment_1), data(:comment_3)], as: "comments", for: data(:post))
+    rescue
+      error in [ExUnit.AssertionError] ->
+        assert msg == error.message
+    end
+  end
 end
