@@ -1,5 +1,5 @@
 defmodule JsonApiAssert do
-  import ExUnit.Assertions, only: [assert: 2, refute: 2]
+  import ExUnit.Assertions, only: [assert: 1, assert: 2, refute: 2]
 
   @moduledoc """
   JsonApiAssert is a collection of composable test helpers to ease
@@ -59,6 +59,77 @@ defmodule JsonApiAssert do
 
   def assert_jsonapi(_payload, _members),
     do: raise ExUnit.AssertionError, "jsonapi object not found"
+
+  @doc """
+  Asserts that a valid "links" object and it's members, "link" objects, exist
+  in the payload
+
+  ## Examples
+
+      @links = %{
+        "related" => %{
+          "href" => "http://example.com/articles/1/comments"
+          "meta" => {
+            "count": 10
+          }
+        }
+      }
+
+      payload
+      |> assert_links(@links)
+
+  The optional members argument should be a map of members you expect to be in
+  the "links" object of the payload.
+  """
+  @spec assert_links(map, map) :: map
+  def assert_links(payload, members \\ %{})
+
+  def assert_links(%{"links" => links}, _members) when not is_map(links),
+    do: raise ExUnit.AssertionError, "the value of each links member MUST be an object"
+  def assert_links(%{"links" => links} = payload, members) do
+    unless members == %{}, do: assert links == members
+
+    for {key, value} <- links do
+      valid? = validate_links_member(key, value)
+
+      case valid? do
+        {:ok} -> payload
+        {:error, msg} -> raise ExUnit.AssertionError, msg
+      end
+    end
+
+    payload
+  end
+  def assert_links(_payload, _members),
+    do: raise ExUnit.AssertionError, "links object not found"
+
+  defp validate_links_member(_key, member) when is_binary(member),
+    do: {:ok}
+  defp validate_links_member(_key, member) when is_map(member) do
+    keys = Map.keys(member)
+    valid_keys = ["href", "meta"]
+    invalid_keys = Enum.join(keys -- valid_keys, ", ")
+
+    if length(keys -- valid_keys) > 0 do
+      msg = """
+      A link MUST be represented as either a string or a map containing only `href` and `meta` objects
+
+      Invalid keys: #{invalid_keys}
+      """
+      {:error, msg}
+    else
+      {:ok}
+    end
+  end
+  defp validate_links_member(key, _member) do
+    msg = """
+    A link MUST be represented as either a string or a map containing only `href` and `meta` objects
+
+    The value for key `#{key}` must be a string or map
+    """
+
+    {:error, msg}
+  end
 
   @doc """
   Asserts that a given record is included in the `data` object of the payload.
