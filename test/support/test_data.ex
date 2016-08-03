@@ -84,6 +84,46 @@ defmodule JsonApiAssert.TestData do
     }
   end
 
+  def links do
+    %{
+      "links" => %{
+        "self" => "http://example.com/posts"
+      }
+    }
+  end
+
+  def valid_members do
+    %{
+      "links" => %{
+        "related" => %{
+          "href" => "http://example.com/articles/1/comments",
+          "meta" => %{
+            "count" => 10
+          }
+        }
+      }
+    }
+  end
+
+  def invalid_member_1 do
+    %{
+      "links" => %{
+        "related" => %{
+          "invalid" => "member",
+          "also_invalid" => "member"
+        }
+      }
+    }
+  end
+
+  def invalid_member_2 do
+    %{
+      "links" => %{
+        "invalid" => []
+      }
+    }
+  end
+
   def payload do
     %{
       "jsonapi" => %{

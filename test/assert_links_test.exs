@@ -3,40 +3,8 @@ defmodule AssertLinksTest do
   import JsonApiAssert, only: [assert_links: 1, assert_links: 2]
   import JsonApiAssert.TestData, only: [data: 1]
 
-  @links %{
-    "links" => %{
-      "self" => "http://example.com/posts"
-    }
-  }
-
-  @valid_members %{
-    "links" => %{
-      "related" => %{
-        "href" => "http://example.com/articles/1/comments",
-        "meta" => %{
-          "count" => 10
-        }
-      }
-    }
-  }
-
-  @invalid_member_1 %{
-    "links" => %{
-      "related" => %{
-        "invalid" => "member",
-        "also_invalid" => "member"
-      }
-    }
-  }
-
-  @invalid_member_2 %{
-    "links" => %{
-      "invalid" => []
-    }
-  }
-
   test "assert will return original payload" do
-    payload = Map.merge(data(:payload), @links)
+    payload = Map.merge(data(:payload), data(:links))
 
     assert payload == assert_links(payload)
   end
@@ -104,7 +72,7 @@ defmodule AssertLinksTest do
     """
 
     try do
-      Map.merge(data(:payload), @invalid_member_2)
+      Map.merge(data(:payload), data(:invalid_member_2))
       |> assert_links
     rescue
       error in [ExUnit.AssertionError] ->
@@ -128,7 +96,7 @@ defmodule AssertLinksTest do
     """
 
     try do
-      Map.merge(data(:payload), @invalid_member_1)
+      Map.merge(data(:payload), data(:invalid_member_1))
       |> assert_links
     rescue
       error in [ExUnit.AssertionError] ->
@@ -145,16 +113,16 @@ defmodule AssertLinksTest do
   end
 
   test "assert will not raise when members match" do
-    Map.merge(data(:payload), @valid_members)
-    |> assert_links(@valid_members["links"])
+    Map.merge(data(:payload), data(:valid_members))
+    |> assert_links(data(:valid_members)["links"])
   end
 
   test "assert will raise when members do not match" do
     msg = "Assertion with == failed"
 
     try do
-      Map.merge(data(:payload), @valid_members)
-      |> assert_links(Map.merge(@links["links"], @valid_members["links"]))
+      Map.merge(data(:payload), data(:valid_members))
+      |> assert_links(Map.merge(data(:links)["links"], data(:valid_members)["links"]))
     rescue
       error in [ExUnit.AssertionError] ->
         assert msg == error.message
