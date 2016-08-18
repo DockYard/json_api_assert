@@ -155,7 +155,7 @@ defmodule JsonApiAssert do
   ## Examples
 
       payload
-      |> assert_relationship(pet1, as: "pets", for: owner1)
+      |> assert_relationship(pet1, as: "pets", for: [:data, owner1])
 
   The `as:` atom must be passed the name of the relationship. It will not be derived from the child.
 
@@ -163,31 +163,28 @@ defmodule JsonApiAssert do
   the payload:
 
       payload
-      |> assert_relationship(pet1, as: "pets", for: owner1, included: true)
+      |> assert_relationship(pet1, as: "pets", for: [:data, owner1], included: true)
 
   This is functionally equivalent to:
 
       payload
-      |> assert_relationship(pet1, as: "pets", for: owner1)
+      |> assert_relationship(pet1, as: "pets", for: [:data, owner1])
       |> assert_included(pet1)
 
   If you pass `false` instead `refute_included/3` is used.
 
   This function can also take a list of child records. The list will be iterated over asserting each record individually.
   """
-  @spec assert_relationship(map, map | list, [as: binary, for: binary, included: boolean]) :: map
+  @spec assert_relationship(map, map | list, [as: binary, for: list, included: boolean]) :: map
   def assert_relationship(payload, [], _opts), do: payload
   def assert_relationship(payload, [child_record | child_records], opts) do
     assert_relationship(payload, child_record, opts)
     |> assert_relationship(child_records, opts)
   end
-  def assert_relationship(payload, child_record, [as: as, for: parent_record]),
-    do: assert_relationship(payload, child_record, as: as, for: parent_record, included: nil)
-  def assert_relationship(payload, child_record, [as: as, for: parent_record, included: included?]) do
-    parent_record =
-      merge_data([], payload["data"])
-      |> merge_data(payload["included"])
-      |> assert_record(parent_record)
+  def assert_relationship(payload, child_record, [as: as, for: path]),
+    do: assert_relationship(payload, child_record, as: as, for: path, included: nil)
+  def assert_relationship(payload, child_record, [as: as, for: path, included: included?]) do
+    parent_record = record_from_path(payload, path)
 
     relationships = parent_record["relationships"]
 
@@ -225,22 +222,22 @@ defmodule JsonApiAssert do
   ## Examples
 
       payload
-      |> refute_relationship(pet1, as: "pets", for: owner1)
+      |> refute_relationship(pet1, as: "pets", for: [:data, owner1])
 
   The `as:` atom must be passed the name of the relationship. It will not be derived from the child.
 
   This function can also take a list of child records. The list will be iterated over refuting each record individually.
   """
-  @spec refute_relationship(map, map | list, [as: binary, for: binary]) :: map
+  @spec refute_relationship(map, map | list, [as: binary, for: list]) :: map
   def refute_relationship(payload, [], _opts), do: payload
   def refute_relationship(payload, [child_record | child_records], opts) do
     refute_relationship(payload, child_record, opts)
     |> refute_relationship(child_records, opts)
   end
-  def refute_relationship(payload, child_record, [as: as, for: parent_record]) do
-    merge_data([], payload["data"])
-    |> merge_data(payload["included"])
-    |> assert_record(parent_record)
+  def refute_relationship(payload, child_record, [as: as, for: path]) do
+    parent_record = record_from_path(payload, path)
+
+    parent_record
     |> get_in(["relationships", as, "data"])
     |> List.wrap()
     |> Enum.find(&(meta_data_compare(&1, child_record)))
@@ -299,22 +296,15 @@ defmodule JsonApiAssert do
     end
   end
 
-  defp find_record(data, record) do
-    data
-    |> List.wrap
-    |> Enum.find(&(meta_data_compare(&1, record)))
+  defp find_record(data, record) when is_list(data) do
+    Enum.find(data, &(meta_data_compare(&1, record)))
   end
+  defp find_record(data, record),
+    do: find_record([data], record)
 
   defp meta_data_compare(record_1, record_2) do
     record_1["id"] == record_2["id"] && record_1["type"] == record_2["type"]
   end
-
-  defp merge_data(payload, nil),
-    do: merge_data(payload, %{})
-  defp merge_data(payload, data) when is_list(data),
-    do: payload ++ data
-  defp merge_data(payload, data) when is_map(data),
-    do: merge_data(payload, [data])
 
   defp enforce_top_level_constraints(payload) do
     if Map.has_key?(payload, "data") && Map.has_key?(payload, "errors"),
@@ -325,5 +315,14 @@ defmodule JsonApiAssert do
 
     unless Map.has_key?(payload, "data") || Map.has_key?(payload, "errors") || Map.has_key?(payload, "meta"),
       do: raise ExUnit.AssertionError, "A document MUST contain at least one of the following top-level members: 'data', 'errors', 'meta'"
+  end
+
+  defp record_from_path(payload, path) do
+    data_path =
+      List.delete_at(path, -1)
+      |> Enum.map(&(Atom.to_string(&1)))
+
+    get_in(payload, data_path)
+    |> assert_record(Enum.at(path, -1))
   end
 end

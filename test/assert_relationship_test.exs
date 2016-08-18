@@ -4,12 +4,16 @@ defmodule AssertRelationshipTest do
   import JsonApiAssert.TestData, only: [data: 1]
 
   test "will not raise when relationship is found in a data record" do
-    assert_relationship(data(:payload), data(:author), as: "author", for: data(:post))
+    assert_relationship(data(:payload), data(:author), as: "author", for: [:data, data(:post)])
+  end
+
+  test "will not raise when relationship is found in a included record" do
+    assert_relationship(data(:payload), data(:post), as: "posts", for: [:included, data(:author)])
   end
 
   test "will raise if `as:` is not passed" do
     try do
-      assert_relationship(data(:payload), data(:author), for: data(:post))
+      assert_relationship(data(:payload), data(:author), for: [:data, data(:post)])
     rescue
       error in [ExUnit.AssertionError] ->
         assert "you must pass `as:` with the name of the relationship" == error.message
@@ -32,7 +36,7 @@ defmodule AssertRelationshipTest do
       |> put_in(["id"], "2")
 
     try do
-      assert_relationship(data(:payload), author, as: "author", for: data(:post))
+      assert_relationship(data(:payload), author, as: "author", for: [:data, data(:post)])
     rescue
       error in [ExUnit.AssertionError] ->
         assert msg == error.message
@@ -46,7 +50,7 @@ defmodule AssertRelationshipTest do
       |> put_in(["type"], "writer")
 
     try do
-      assert_relationship(data(:payload), author, as: "author", for: data(:post))
+      assert_relationship(data(:payload), author, as: "author", for: [:data, data(:post)])
     rescue
       error in [ExUnit.AssertionError] ->
         assert msg == error.message
@@ -57,7 +61,7 @@ defmodule AssertRelationshipTest do
     msg = "could not find the relationship `writer` for record matching `id` 1 and `type` \"post\""
 
     try do
-      assert_relationship(data(:payload), data(:author), as: "writer", for: data(:post))
+      assert_relationship(data(:payload), data(:author), as: "writer", for: [:data, data(:post)])
     rescue
       error in [ExUnit.AssertionError] ->
         assert msg == error.message
@@ -78,7 +82,7 @@ defmodule AssertRelationshipTest do
     }
 
     try do
-      assert_relationship(payload, data(:author), as: "writer", for: data(:post))
+      assert_relationship(payload, data(:author), as: "writer", for: [:data, data(:post)])
     rescue
       error in [ExUnit.AssertionError] ->
         assert msg == error.message
@@ -91,7 +95,7 @@ defmodule AssertRelationshipTest do
       |> put_in(["attributes", "title"], "Father of all demos")
 
     try do
-      assert_relationship(data(:payload), data(:author), as: "writer", for: post)
+      assert_relationship(data(:payload), data(:author), as: "writer", for: [:data, post])
     rescue
       error in [ExUnit.AssertionError] ->
         assert %{"title" => "Mother of all demos"} == error.left
@@ -101,19 +105,19 @@ defmodule AssertRelationshipTest do
   end
 
   test "will return the original payload" do
-    payload = assert_relationship(data(:payload), data(:author), as: "author", for: data(:post))
+    payload = assert_relationship(data(:payload), data(:author), as: "author", for: [:data, data(:post)])
     assert payload == data(:payload)
   end
 
   test "will assert the record is included when `included: true` is used" do
-    assert_relationship(data(:payload), data(:comment_1), as: "comments", for: data(:post), included: true)
+    assert_relationship(data(:payload), data(:comment_1), as: "comments", for: [:data, data(:post)], included: true)
   end
 
   test "will raise when  the record is not included and `included: true` is used" do
     msg = "could not find a record with matching `id` 5 and `type` \"comment\""
 
     try do
-      assert_relationship(data(:payload), data(:comment_5), as: "comments", for: data(:post), included: true)
+      assert_relationship(data(:payload), data(:comment_5), as: "comments", for: [:data, data(:post)], included: true)
     rescue
       error in [ExUnit.AssertionError] ->
         assert msg == error.message
@@ -128,7 +132,7 @@ defmodule AssertRelationshipTest do
     msg = "did not expect #{inspect record} to be found."
 
     try do
-      assert_relationship(data(:payload), data(:comment_1), as: "comments", for: data(:post), included: false)
+      assert_relationship(data(:payload), data(:comment_1), as: "comments", for: [:data, data(:post)], included: false)
     rescue
       error in [ExUnit.AssertionError] ->
         assert msg == error.message
@@ -136,7 +140,7 @@ defmodule AssertRelationshipTest do
   end
 
   test "can assert many records at once" do
-    payload = assert_relationship(data(:payload_2), [data(:comment_1), data(:comment_2)], as: "comments", for: data(:post))
+    payload = assert_relationship(data(:payload_2), [data(:comment_1), data(:comment_2)], as: "comments", for: [:data, data(:post)])
 
     assert payload == data(:payload_2)
   end
@@ -145,7 +149,7 @@ defmodule AssertRelationshipTest do
     msg = "could not find relationship `comments` with `id` 3 and `type` \"comment\" for record matching `id` 1 and `type` \"post\""
 
     try do
-      assert_relationship(data(:payload_2), [data(:comment_1), data(:comment_3)], as: "comments", for: data(:post))
+      assert_relationship(data(:payload_2), [data(:comment_1), data(:comment_3)], as: "comments", for: [:data, data(:post)])
     rescue
       error in [ExUnit.AssertionError] ->
         assert msg == error.message
