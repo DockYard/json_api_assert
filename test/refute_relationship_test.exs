@@ -7,7 +7,7 @@ defmodule RefuteRelationshipTest do
     msg = "was not expecting to find the relationship `author` with `id` 1 and `type` \"author\" for record matching `id` 1 and `type` \"post\""
 
     try do
-      refute_relationship(data(:payload), data(:author), as: "author", for: data(:post))
+      refute_relationship(data(:payload), data(:author), as: "author", for: [:data, data(:post)])
     rescue
       error in [ExUnit.AssertionError] ->
         assert msg == error.message
@@ -16,7 +16,7 @@ defmodule RefuteRelationshipTest do
 
   test "will raise if `as:` is not passed" do
     try do
-      refute_relationship(data(:payload), data(:author), for: data(:post))
+      refute_relationship(data(:payload), data(:author), for: [:data, data(:post)])
     rescue
       error in [ExUnit.AssertionError] ->
         assert "you must pass `as:` with the name of the relationship" == error.message
@@ -37,7 +37,7 @@ defmodule RefuteRelationshipTest do
       data(:author)
       |> put_in(["id"], "2")
 
-    refute_relationship(data(:payload), author, as: "author", for: data(:post))
+    refute_relationship(data(:payload), author, as: "author", for: [:data, data(:post)])
   end
 
   test "will not raise when child record's type not found as a relationship for parent" do
@@ -45,11 +45,15 @@ defmodule RefuteRelationshipTest do
       data(:author)
       |> put_in(["type"], "writer")
 
-    refute_relationship(data(:payload), author, as: "author", for: data(:post))
+    refute_relationship(data(:payload), author, as: "author", for: [:data, data(:post)])
   end
 
-  test "will not raise when relationship name not found" do
-    refute_relationship(data(:payload), data(:author), as: "writer", for: data(:post))
+  test "will not raise when relationship name not found in data" do
+    refute_relationship(data(:payload), data(:author), as: "writer", for: [:data, data(:post)])
+  end
+
+  test "will not raise when relationship name not found in included" do
+    refute_relationship(data(:payload), data(:post), as: "posting", for: [:included, data(:author)])
   end
 
   test "will not raise when no relationship data in parent record" do
@@ -64,7 +68,7 @@ defmodule RefuteRelationshipTest do
       }
     }
 
-    refute_relationship(payload, data(:author), as: "writer", for: data(:post))
+    refute_relationship(payload, data(:author), as: "writer", for: [:data, data(:post)])
   end
 
   test "will raise when parent record is not found" do
@@ -73,7 +77,7 @@ defmodule RefuteRelationshipTest do
       |> put_in(["attributes", "title"], "Father of all demos")
 
     try do
-      refute_relationship(data(:payload), data(:author), as: "writer", for: post)
+      refute_relationship(data(:payload), data(:author), as: "writer", for: [:data, post])
     rescue
       error in [ExUnit.AssertionError] ->
         assert %{"title" => "Mother of all demos"} == error.left
@@ -83,12 +87,12 @@ defmodule RefuteRelationshipTest do
   end
 
   test "will return the original payload" do
-    payload = refute_relationship(data(:payload), data(:author), as: "writer", for: data(:post))
+    payload = refute_relationship(data(:payload), data(:author), as: "writer", for: [:data, data(:post)])
     assert payload == data(:payload)
   end
 
   test "can refute many records at once" do
-    payload = refute_relationship(data(:payload_2), [data(:comment_3), data(:comment_4)], as: "comments", for: data(:post))
+    payload = refute_relationship(data(:payload_2), [data(:comment_3), data(:comment_4)], as: "comments", for: [:data, data(:post)])
 
     assert payload == data(:payload_2)
   end
@@ -97,7 +101,7 @@ defmodule RefuteRelationshipTest do
     msg = "was not expecting to find the relationship `comments` with `id` 1 and `type` \"comment\" for record matching `id` 1 and `type` \"post\""
 
     try do
-      refute_relationship(data(:payload_2), [data(:comment_3), data(:comment_1)], as: "comments", for: data(:post))
+      refute_relationship(data(:payload_2), [data(:comment_3), data(:comment_1)], as: "comments", for: [:data, data(:post)])
     rescue
       error in [ExUnit.AssertionError] ->
         assert msg == error.message
