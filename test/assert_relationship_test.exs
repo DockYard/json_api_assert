@@ -155,4 +155,8 @@ defmodule AssertRelationshipTest do
         assert msg == error.message
     end
   end
+
+  test "will not fail when path given as binaries" do
+    assert_relationship(data(:payload_2), [data(:comment_1), data(:comment_2)], as: "comments", for: ["data", data(:post)])
+  end
 end
