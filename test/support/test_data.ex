@@ -119,7 +119,8 @@ defmodule JsonApiAssert.TestData do
   def invalid_member_2 do
     %{
       "links" => %{
-        "invalid" => []
+        "self" => "http://example.com/posts/1/relationships/author",
+        "related" => []
       }
     }
   end
@@ -137,7 +138,14 @@ defmodule JsonApiAssert.TestData do
         },
         "relationships" => %{
           "author" => %{
-            "data" => %{ "type" => "author", "id" => "1" }
+            "data" => %{
+              "type" => "author",
+              "id" => "1"
+            },
+            "links" => %{
+              "self" => "http://example.com/posts/1/relationships/author",
+              "related" => "http://example.com/posts/1/author"
+            }
           },
           "comments" => %{
             "data" => [

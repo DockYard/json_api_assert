@@ -62,7 +62,9 @@ defmodule JsonApiAssert do
 
   @doc """
   Asserts that a valid "links" object and it's members, "link" objects, exist
-  in the payload
+  in the payload. The `path:` atom must be passed with a list containing the
+  path to the "links" object, with the last item being the object you wish
+  to assert.
 
   ## Examples
 
@@ -75,33 +77,53 @@ defmodule JsonApiAssert do
         }
       }
 
+  To assert that the above "links" object is in the root of the payload:
+
       payload
-      |> assert_links(@links)
+      |> assert_links(path: [@links])
+
+  To assert that the above "links" object is in the data->relationships->post
+  record of the payload:
+
+      payload
+      |> assert_links(path: [:data, :relationships, :post, @links])
 
   The optional members argument should be a map of members you expect to be in
   the "links" object of the payload.
   """
-  @spec assert_links(map, map) :: map
-  def assert_links(payload, members \\ %{})
+  @spec assert_links(map, [path: list]) :: map
+  def assert_links(payload, [path: [%{"links" => members}]]) do
+    assert payload["links"] == members
 
-  def assert_links(%{"links" => links}, _members) when not is_map(links),
-    do: raise ExUnit.AssertionError, "the value of each links member MUST be an object"
-  def assert_links(%{"links" => links} = payload, members) do
-    unless members == %{}, do: assert links == members
+    validate_links(members)
+    payload
+  end
+  def assert_links(payload, [path: path]) do
+    data = List.last(path)
 
-    for {key, value} <- links do
-      valid? = validate_links_member(key, value)
+    data_path =
+      List.delete_at(path, -1)
+      |> Enum.map(&to_string(&1))
 
-      case valid? do
-        {:ok} -> payload
+    assert get_in(payload, data_path) == data
+
+    validate_links(data["links"])
+    payload
+  end
+  def assert_links(_payload, _opts),
+    do: raise ExUnit.AssertionError, "you must pass `path:` to the links object"
+
+  defp validate_links(members) do
+    unless is_map(members),
+      do: raise ExUnit.AssertionError, "the value of each links member MUST be an object"
+
+    for {key, value} <- members do
+      case validate_links_member(key, value) do
+        {:ok} -> true
         {:error, msg} -> raise ExUnit.AssertionError, msg
       end
     end
-
-    payload
   end
-  def assert_links(_payload, _members),
-    do: raise ExUnit.AssertionError, "links object not found"
 
   defp validate_links_member(_key, member) when is_binary(member),
     do: {:ok}
