@@ -67,7 +67,7 @@ import JsonApiAssert.Serializer, only: [serialize: 2]
 
 user_params = %{email: "brian.dockyard@example.com"}
 
-user_json = serialize(user, type: "user")
+user_json = serialize(user_params, type: "user")
 
 payload
 |> assert_data(user_json)
