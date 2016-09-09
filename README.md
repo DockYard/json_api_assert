@@ -43,10 +43,12 @@ built-in serializers.
 ```elixir
 import JsonApiAssert.Serializer, only: [serialize: 1]
 
-user1 = serialize(user)
+user = %User{email: "brian.dockyard@example.com"}
+
+user_json = serialize(user)
 
 payload
-|> assert_data(user1)
+|> assert_data(user_json)
 ```
 
 As a convenience you can import the short-hand `s` function
@@ -56,6 +58,19 @@ import JsonApiAssert.Serializer, only: [s: 1]
 
 payload
 |> assert_data(s(user))
+```
+
+If you want to serialize JSON-API payloads from maps instead of structs, the only extra work you must do is provide a `type` argument
+
+```elixir
+import JsonApiAssert.Serializer, only: [serialize: 2]
+
+user_params = %{email: "brian.dockyard@example.com"}
+
+user_json = serialize(user_params, type: "user")
+
+payload
+|> assert_data(user_json)
 ```
 
 The built-in serializers should be good enough for most cases. However,
