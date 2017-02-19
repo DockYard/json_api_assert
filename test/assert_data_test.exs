@@ -15,6 +15,14 @@ defmodule AssertDataTest do
     assert_data(data(:payload), data(:post))
   end
 
+  test "will not raise when record is found using regex" do
+    post =
+      data(:post)
+      |> put_in(["id"], ~r/\d+/)
+
+    assert_data(data(:payload), post)
+  end
+
   test "will raise when record with different attribute values is not found" do
     post =
       data(:post)
@@ -36,6 +44,21 @@ defmodule AssertDataTest do
     post =
       data(:post)
       |> put_in(["id"], "2")
+
+    try do
+      assert_data(data(:payload), post)
+    rescue
+      error in [ExUnit.AssertionError] ->
+        assert msg == error.message
+    end
+  end
+
+  test "will raise when there is an id mismatch via regex" do
+    msg = "could not find a record with matching `id` ~r/^$/ and `type` \"post\""
+
+    post =
+      data(:post)
+      |> put_in(["id"], ~r/^$/)
 
     try do
       assert_data(data(:payload), post)

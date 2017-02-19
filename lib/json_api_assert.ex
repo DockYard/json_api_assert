@@ -189,13 +189,15 @@ defmodule JsonApiAssert do
     relationships = parent_record["relationships"]
 
     if !relationships do
-      raise ExUnit.AssertionError, "could not find any relationships for record matching `id` #{parent_record["id"]} and `type` \"#{parent_record["type"]}\""
+      {id, type} = extract_identifiers(parent_record)
+      raise ExUnit.AssertionError, "could not find any relationships for record matching `id` #{id} and `type` \"#{type}\""
     end
 
     relationship = relationships[as]
 
     if !relationship do
-      raise ExUnit.AssertionError, "could not find the relationship `#{as}` for record matching `id` #{parent_record["id"]} and `type` \"#{parent_record["type"]}\""
+      {id, type} = extract_identifiers(parent_record)
+      raise ExUnit.AssertionError, "could not find the relationship `#{as}` for record matching `id` #{id} and `type` \"#{type}\""
     end
 
     relationship =
@@ -203,7 +205,9 @@ defmodule JsonApiAssert do
       |> List.wrap()
       |> Enum.find(&(meta_data_compare(&1, child_record)))
 
-    assert relationship, "could not find relationship `#{as}` with `id` #{child_record["id"]} and `type` \"#{child_record["type"]}\" for record matching `id` #{parent_record["id"]} and `type` \"#{parent_record["type"]}\""
+    {child_id, child_type} = extract_identifiers(child_record)
+    {parent_id, parent_type} = extract_identifiers(parent_record)
+    assert relationship, "could not find relationship `#{as}` with `id` #{child_id} and `type` \"#{child_type}\" for record matching `id` #{parent_id} and `type` \"#{parent_type}\""
 
     case included? do
       nil -> payload
@@ -237,11 +241,14 @@ defmodule JsonApiAssert do
   def refute_relationship(payload, child_record, [as: as, for: path]) do
     parent_record = record_from_path(payload, path)
 
+    {child_id, child_type} = extract_identifiers(child_record)
+    {parent_id, parent_type} = extract_identifiers(parent_record)
+
     parent_record
     |> get_in(["relationships", as, "data"])
     |> List.wrap()
     |> Enum.find(&(meta_data_compare(&1, child_record)))
-    |> refute("was not expecting to find the relationship `#{as}` with `id` #{child_record["id"]} and `type` \"#{child_record["type"]}\" for record matching `id` #{parent_record["id"]} and `type` \"#{parent_record["type"]}\"")
+    |> refute("was not expecting to find the relationship `#{as}` with `id` #{child_id} and `type` \"#{child_type}\" for record matching `id` #{parent_id} and `type` \"#{parent_type}\"")
 
     payload
   end
@@ -251,10 +258,12 @@ defmodule JsonApiAssert do
     do: raise ExUnit.AssertionError, "you must pass `for:` with the parent record"
 
   defp assert_record(data, record) do
+    {id, type} = extract_identifiers(record)
+
     find_record(data, record)
     |> case do
       nil ->
-        assert nil, "could not find a record with matching `id` #{record["id"]} and `type` \"#{record["type"]}\""
+        assert nil, "could not find a record with matching `id` #{id} and `type` \"#{type}\""
       %{"attributes" => attributes} = found_record ->
         Enum.reduce(attributes, [], fn({key, value}, attrs) ->
           if value != record["attributes"][key] do
@@ -269,7 +278,7 @@ defmodule JsonApiAssert do
             opts = [
             left: Enum.into(keys, %{}, fn(key) -> {key, attributes[key]} end),
               right: Enum.into(keys, %{}, fn(key) -> {key, record["attributes"][key]} end),
-              message: "record with `id` #{record["id"]} and `type` \"#{record["type"]}\" was found but had mis-matching attributes"
+              message: "record with `id` #{id} and `type` \"#{type}\" was found but had mis-matching attributes"
             ]
             raise(ExUnit.AssertionError, opts)
         end
@@ -303,8 +312,15 @@ defmodule JsonApiAssert do
     do: find_record([data], record)
 
   defp meta_data_compare(record_1, record_2) do
-    record_1["id"] == record_2["id"] && record_1["type"] == record_2["type"]
+    value_compare(record_1["id"], record_2["id"]) && value_compare(record_1["type"], record_2["type"])
   end
+
+  defp value_compare(value, %Regex{} = matcher),
+    do: value_compare(matcher, value)
+  defp value_compare(%Regex{} = matcher, value),
+    do: Regex.match?(matcher, value)
+  defp value_compare(value_1, value_2),
+    do: value_1 == value_2
 
   defp enforce_top_level_constraints(payload) do
     if Map.has_key?(payload, "data") && Map.has_key?(payload, "errors"),
@@ -325,4 +341,12 @@ defmodule JsonApiAssert do
     get_in(payload, data_path)
     |> assert_record(Enum.at(path, -1))
   end
+
+  defp extract_identifiers(record),
+    do: {extract_value(record["id"]), extract_value(record["type"])}
+
+  defp extract_value(%Regex{} = value),
+    do: inspect(value)
+  defp extract_value(value),
+    do: value
 end

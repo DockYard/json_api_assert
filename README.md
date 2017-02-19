@@ -89,6 +89,32 @@ schema](http://jsonapi.org/format/#document-resource-objects):
 }
 ```
 
+## Value matching via regex
+
+Use a Regex as the value if that value is non-deterministic.
+
+```elixir
+record = %{
+  "id" => ~r/\d+/,
+  "type" => "author",
+  "attributes" => %{
+    "first-name" => "Brian",
+    "last-name" => "Cardarella"
+  }
+}
+
+assert_data(payload, record)
+```
+
+A common use-case for this is when you are creating new records. The
+resulting value for the `id` is likely unknown and assigned at the
+run-time of the test suite. Using a Regex will allow you to assert that
+the id value is present and conforms to a value range and pattern that
+you expect.
+
+Be careful however, you may get false-positives as the Regex matching
+can be done upon data as well as datum sets.
+
 ## Authors
 
 * [Brian Cardarella](http://twitter.com/bcardarella)
