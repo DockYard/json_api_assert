@@ -23,6 +23,14 @@ defmodule AssertDataTest do
     assert_data(data(:payload), post)
   end
 
+  test "will not raise when matching attribute with regex" do
+    post =
+      data(:post)
+      |> put_in(["attributes", "title"], ~r/^Mother.+$/)
+
+    assert_data(data(:payload), post)
+  end
+
   test "will raise when record with different attribute values is not found" do
     post =
       data(:post)
