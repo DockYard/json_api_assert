@@ -267,10 +267,10 @@ defmodule JsonApiAssert do
         assert nil, "could not find a record with matching `id` #{id} and `type` \"#{type}\""
       %{"attributes" => attributes} = found_record ->
         Enum.reduce(attributes, [], fn({key, value}, attrs) ->
-          if value != record["attributes"][key] do
-            attrs ++ [key]
-          else
+          if value_match?(value, record["attributes"][key]) do
             attrs
+          else
+            attrs ++ [key]
           end
         end)
         |> case do
@@ -294,7 +294,7 @@ defmodule JsonApiAssert do
         matching =
           attributes
           |> Enum.reduce([], fn({key, value}, attrs) ->
-            if value == record["attributes"][key] do
+            if value_match?(value, record["attributes"][key]) do
               attrs ++ [{key, value}]
             else
               attrs

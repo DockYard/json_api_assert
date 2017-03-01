@@ -47,6 +47,26 @@ defmodule RefuteDataTest do
     end
   end
 
+  test "will raise when matching attribute with regex" do
+    post =
+      data(:post)
+      |> put_in(["attributes", "title"], ~r/^Mother.+$/)
+
+    record = %{
+      "id" => "1",
+      "type" => "post"
+    }
+
+    msg = "did not expect #{inspect record} to be found."
+
+    try do
+      refute_data(data(:payload), post)
+    rescue
+      error in [ExUnit.AssertionError] ->
+        assert msg == error.message
+    end
+  end
+
   test "will return the original payload" do
     post =
       data(:post)
