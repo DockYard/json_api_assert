@@ -252,6 +252,7 @@ defmodule JsonApiAssert.SerializerTest do
 
   test "serializing NaiveDateTime values" do
     {:ok, created_at} = NaiveDateTime.from_erl({{2016,1,1},{0,0,0}})
+
     actual =
       %Post{id: 1, created_at: created_at}
       |> serialize()
