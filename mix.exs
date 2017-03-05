@@ -10,7 +10,7 @@ defmodule JsonApiAssert.Mixfile do
      start_permanent: Mix.env == :prod,
      package: package(),
      description: "assertions for JSON API payload",
-     deps: deps,
+     deps: deps(),
      docs: [
       main: "JsonApiAssert",
       logo: "jsonapi-assert.png"
