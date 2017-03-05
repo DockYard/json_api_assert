@@ -249,4 +249,22 @@ defmodule JsonApiAssert.SerializerTest do
 
     assert actual == expected
   end
+
+  test "serializing NaiveDateTime values" do
+    {:ok, created_at} = NaiveDateTime.from_erl({{2016,1,1},{0,0,0}})
+
+    actual =
+      %Post{id: 1, created_at: created_at}
+      |> serialize()
+
+    expected = %{
+      "id" => "1",
+      "type" => "post",
+      "attributes" => %{
+        "created-at" => "2016-01-01T00:00:00"
+      }
+    }
+
+    assert actual == expected
+  end
 end
