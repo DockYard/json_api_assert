@@ -58,7 +58,7 @@ defmodule JsonApiAssert.Serializer do
       struct
       |> Module.split()
       |> List.last()
-      |> Mix.Utils.underscore()
+      |> Macro.underscore()
 
     Map.put(map, "type", type)
   end
