@@ -119,5 +119,7 @@ defmodule JsonApiAssert.Serializer do
     do: apply(Ecto.Time, :to_iso8601, [value])
   defp serialize_value(%{__struct__: Ecto.Date} = value),
     do: apply(Ecto.Date, :to_iso8601, [value])
+  defp serialize_value(%{__struct__: NaiveDateTime} = value),
+    do: apply(NaiveDateTime, :to_iso8601, [value])
   defp serialize_value(value), do: value
 end
