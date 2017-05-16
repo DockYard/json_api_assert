@@ -43,7 +43,7 @@ defmodule JsonApiAssert.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [{:ecto, "~> 1.1.8", only: :test},
+    [{:ecto, "~> 2.1.4", only: :test},
      {:earmark, "~> 0.2.1", only: :dev},
      {:ex_doc, "~> 0.11.5", only: :dev}]
   end

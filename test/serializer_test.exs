@@ -211,7 +211,7 @@ defmodule JsonApiAssert.SerializerTest do
       "id" => "1",
       "type" => "post",
       "attributes" => %{
-        "created-at" => "2016-01-01T00:00:00Z"
+        "created-at" => "2016-01-01T00:00:00"
       }
     }
 
