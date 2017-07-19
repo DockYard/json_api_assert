@@ -1,8 +1,8 @@
-# JsonApiAssert
+# JsonApiAssert [![Build Status](https://secure.travis-ci.org/DockYard/json_api_assert.svg?branch=master)](http://travis-ci.org/DockYard/json_api_assert)
 
 Easily build composable queries for Elixir.
 
-[![Build Status](https://secure.travis-ci.org/DockYard/json_api_assert.svg?branch=master)](http://travis-ci.org/DockYard/json_api_assert)
+**[AuthTestSupport is built and maintained by DockYard, contact us for expert Elixir and Phoenix consulting](https://dockyard.com/phoenix-consulting)**.
 
 ## Usage
 
