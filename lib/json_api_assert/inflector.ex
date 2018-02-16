@@ -24,27 +24,24 @@ defmodule JsonApiAssert.Inflector do
                |> Map.put(plural, singular)
              end)
 
+      @doc """
+      Pluralize the given word
+
+      Will try to use a pre-defined rule or default to appending "s" to the end of the word.
+      """
       def pluralize(word) when is_binary(word) do
         @rules
         |> Map.get(word, "#{word}s")
       end
+      @doc """
+      Singuliarze the given word
 
+      Will try to use a pre-defined rule or default to removing the "s" at the end of the word.
+      """
       def singularize(word) when is_binary(word) do
         @rules
         |> Map.get(word, String.replace(word, ~r/s$/, ""))
       end
     end
   end
-
-  Module.add_doc __MODULE__, __ENV__.line + 1, :def, {:pluralize, 1}, (quote do: [word]), """
-  Pluralize the given word
-
-  Will try to use a pre-defined rule or default to appending "s" to the end of the word.
-  """
-
-  Module.add_doc __MODULE__, __ENV__.line + 1, :def, {:singularize, 1}, (quote do: [word]), """
-  Singuliarze the given word
-
-  Will try to use a pre-defined rule or default to removing the "s" at the end of the word.
-  """
 end
