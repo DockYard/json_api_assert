@@ -336,7 +336,7 @@ defmodule JsonApiAssert do
   defp record_from_path(payload, path) do
     data_path =
       List.delete_at(path, -1)
-      |> Enum.map(&(Atom.to_string(&1)))
+      |> Enum.map(&to_string(&1))
 
     get_in(payload, data_path)
     |> assert_record(Enum.at(path, -1))
