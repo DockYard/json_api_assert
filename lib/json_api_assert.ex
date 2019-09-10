@@ -1,5 +1,5 @@
 defmodule JsonApiAssert do
-  import ExUnit.Assertions, only: [assert: 2, refute: 2]
+  import ExUnit.Assertions, only: [assert: 1, assert: 2, refute: 2]
 
   @moduledoc """
   JsonApiAssert is a collection of composable test helpers to ease
@@ -59,6 +59,99 @@ defmodule JsonApiAssert do
 
   def assert_jsonapi(_payload, _members),
     do: raise ExUnit.AssertionError, "jsonapi object not found"
+
+  @doc """
+  Asserts that a valid "links" object and it's members, "link" objects, exist
+  in the payload. The `path:` atom must be passed with a list containing the
+  path to the "links" object, with the last item being the object you wish
+  to assert.
+
+  ## Examples
+
+      @links = %{
+        "related" => %{
+          "href" => "http://example.com/articles/1/comments"
+          "meta" => {
+            "count": 10
+          }
+        }
+      }
+
+  To assert that the above "links" object is in the root of the payload:
+
+      payload
+      |> assert_links(path: [@links])
+
+  To assert that the above "links" object is in the data->relationships->post
+  record of the payload:
+
+      payload
+      |> assert_links(path: [:data, :relationships, :post, @links])
+
+  The optional members argument should be a map of members you expect to be in
+  the "links" object of the payload.
+  """
+  @spec assert_links(map, [path: list]) :: map
+  def assert_links(payload, [path: [%{"links" => members}]]) do
+    assert payload["links"] == members
+
+    validate_links(members)
+    payload
+  end
+  def assert_links(payload, [path: path]) do
+    data = List.last(path)
+
+    data_path =
+      List.delete_at(path, -1)
+      |> Enum.map(&to_string(&1))
+
+    assert get_in(payload, data_path) == data
+
+    validate_links(data["links"])
+    payload
+  end
+  def assert_links(_payload, _opts),
+    do: raise ExUnit.AssertionError, "you must pass `path:` to the links object"
+
+  defp validate_links(members) do
+    unless is_map(members),
+      do: raise ExUnit.AssertionError, "the value of each links member MUST be an object"
+
+    for {key, value} <- members do
+      case validate_links_member(key, value) do
+        {:ok} -> true
+        {:error, msg} -> raise ExUnit.AssertionError, msg
+      end
+    end
+  end
+
+  defp validate_links_member(_key, member) when is_binary(member),
+    do: {:ok}
+  defp validate_links_member(_key, member) when is_map(member) do
+    keys = Map.keys(member)
+    valid_keys = ["href", "meta"]
+    invalid_keys = Enum.join(keys -- valid_keys, ", ")
+
+    if length(keys -- valid_keys) > 0 do
+      msg = """
+      A link MUST be represented as either a string or a map containing only `href` and `meta` objects
+
+      Invalid keys: #{invalid_keys}
+      """
+      {:error, msg}
+    else
+      {:ok}
+    end
+  end
+  defp validate_links_member(key, _member) do
+    msg = """
+    A link MUST be represented as either a string or a map containing only `href` and `meta` objects
+
+    The value for key `#{key}` must be a string or map
+    """
+
+    {:error, msg}
+  end
 
   @doc """
   Asserts that a given record is included in the `data` object of the payload.
