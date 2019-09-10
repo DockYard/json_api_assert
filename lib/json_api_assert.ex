@@ -61,6 +61,37 @@ defmodule JsonApiAssert do
     do: raise ExUnit.AssertionError, "jsonapi object not found"
 
   @doc """
+  Asserts that a valid meta object exists in the payload
+
+  The members argument should be a map of key/value pairs that you expect to be
+  be in the "meta" object of the payload.
+
+  ## Examples
+
+    @meta %{
+      "license" => "The MIT License (MIT)",
+      "authors" => [
+        "Brian Cardarella"
+      ]
+    }
+
+    payload
+    |> assert_meta(@meta)
+  """
+  @spec assert_meta(map, map) :: map
+  def assert_meta(payload, members \\ %{})
+
+  def assert_meta(%{"meta" => meta}, _members) when not is_map(meta),
+    do: raise ExUnit.AssertionError, "the value of each meta member MUST be an object"
+  def assert_meta(%{"meta" => meta} = payload, members) do
+    ExUnit.Assertions.assert meta == members
+
+    payload
+  end
+  def assert_meta(_payload, _members),
+    do: raise ExUnit.AssertionError, "meta object not found"
+
+  @doc """
   Asserts that a given record is included in the `data` object of the payload.
 
   ## Examples
